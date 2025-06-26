@@ -12,6 +12,7 @@ import { FaArrowUp } from "react-icons/fa";
 
 function ConditionalTrigger() {
   const { state } = useSidebar();
+  console.log(state)
   if (state == "collapsed") {
     return <SidebarTrigger className="absolute" />;
   }
