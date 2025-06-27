@@ -6,3 +6,7 @@ export type chatMessageType = {
   id: Key;
   time: string;
 };
+
+export type Users = {
+  
+}
