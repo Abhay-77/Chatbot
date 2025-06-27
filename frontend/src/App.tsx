@@ -9,18 +9,21 @@ import {
 import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { FaArrowUp } from "react-icons/fa";
+import React, { useState } from "react";
+import type { chatMessageType } from "./lib/definitions";
+import { v4 as uuid } from "uuid";
 
-function ConditionalTrigger() {
+const ConditionalTrigger = React.memo(() => {
   const { state } = useSidebar();
-  console.log(state)
   if (state == "collapsed" || window.innerWidth < 768) {
     return <SidebarTrigger className="absolute" />;
   }
   return null;
-}
+});
 
 const App = () => {
-  const chatMessages = [
+  const [message, setMessage] = useState<string>("");
+  const chatMessagesTest: chatMessageType[] = [
     { id: 1, role: "user", content: "Hi there!", time: "10:00 AM" },
     {
       id: 2,
@@ -108,6 +111,28 @@ const App = () => {
       time: "10:07 AM",
     },
   ];
+  const [chatMessages, setChatMessages] =
+    useState<chatMessageType[]>(chatMessagesTest);
+  const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+  const handleSubmit = () => {
+    setChatMessages([
+      ...chatMessages,
+      {
+        content: message,
+        role: "user",
+        id: uuid(),
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+  };
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -119,28 +144,39 @@ const App = () => {
               <p
                 key={mess.id}
                 className={clsx(
-                  `bg-neutral-300 hover:bg-neutral-200 rounded-lg min-h-12 p-1
-                max-w-[40vw] text-wrap m-2 flex items-center`,
+                  `bg-neutral-300 hover:bg-neutral-200 rounded-lg min-h-12 py-1 px-3
+                max-w-[40vw] text-wrap m-2 flex items-center w-fit`,
                   { "justify-self-end": mess.role == "user" }
                 )}
               >
                 {mess.content}
               </p>
             ))}
+            <div ref={scrollRef} />
           </ScrollArea>
-          <div className="relative">
+          <form
+            className="relative"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
             <Input
               className="bg-neutral-300 min-h-12 rounded-lg"
               placeholder="Ask anything"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
             <Button
               variant="secondary"
               size="icon"
+              type="submit"
               className="size-8 absolute bottom-2 right-2 bg-neutral-400"
+              // onClick={handleSubmit}
             >
               <FaArrowUp />
             </Button>
-          </div>
+          </form>
         </section>
       </main>
     </SidebarProvider>

@@ -73,7 +73,7 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-neutral-300">
         <SidebarMenu>
           <div className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200">
             <MdAccountCircle size={20} />
