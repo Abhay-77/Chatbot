@@ -10,7 +10,7 @@ import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { FaArrowUp } from "react-icons/fa";
 import React, { useState } from "react";
-import type { chatMessageType } from "./lib/definitions";
+import type { ChatMessageType } from "../../shared/types";
 import { v4 as uuid } from "uuid";
 
 const ConditionalTrigger = React.memo(() => {
@@ -23,96 +23,95 @@ const ConditionalTrigger = React.memo(() => {
 
 const App = () => {
   const [message, setMessage] = useState<string>("");
-  const chatMessagesTest: chatMessageType[] = [
-    { id: 1, role: "user", content: "Hi there!", time: "10:00 AM" },
-    {
-      id: 2,
-      role: "bot",
-      content: "Hello! How can I help you today?",
-      time: "10:00 AM",
-    },
-    {
-      id: 3,
-      role: "user",
-      content: "What’s the weather like today?",
-      time: "10:01 AM",
-    },
-    {
-      id: 4,
-      role: "bot",
-      content: "It's sunny and 28°C in your location.",
-      time: "10:01 AM",
-    },
-    {
-      id: 5,
-      role: "user",
-      content: "Nice. Can you set a reminder for 2 PM?",
-      time: "10:02 AM",
-    },
-    {
-      id: 6,
-      role: "bot",
-      content: "Sure! Reminder set for 2 PM.",
-      time: "10:02 AM",
-    },
-    {
-      id: 7,
-      role: "user",
-      content: "Thanks. What’s on my to-do list?",
-      time: "10:03 AM",
-    },
-    {
-      id: 8,
-      role: "bot",
-      content:
-        "You have 3 tasks: Finish report, Attend meeting at 1 PM, and Call mom.",
-      time: "10:03 AM",
-    },
-    {
-      id: 9,
-      role: "user",
-      content: "Can you mark 'Finish report' as done?",
-      time: "10:04 AM",
-    },
-    {
-      id: 10,
-      role: "bot",
-      content: "✅ 'Finish report' marked as completed.",
-      time: "10:04 AM",
-    },
-    {
-      id: 11,
-      role: "user",
-      content: "What’s the next task?",
-      time: "10:05 AM",
-    },
-    {
-      id: 12,
-      role: "bot",
-      content: "Next task: Attend meeting at 1 PM.",
-      time: "10:05 AM",
-    },
-    {
-      id: 13,
-      role: "user",
-      content: "Remind me 10 minutes before the meeting.",
-      time: "10:06 AM",
-    },
-    {
-      id: 14,
-      role: "bot",
-      content: "Got it. I’ll remind you at 12:50 PM.",
-      time: "10:06 AM",
-    },
-    {
-      id: 15,
-      role: "user",
-      content: "Awesome. You're the best!",
-      time: "10:07 AM",
-    },
-  ];
-  const [chatMessages, setChatMessages] =
-    useState<chatMessageType[]>(chatMessagesTest);
+  // const chatMessagesTest: ChatMessageType[] = [
+  //   { id: 1, role: "user", content: "Hi there!", time: "10:00 AM" },
+  //   {
+  //     id: 2,
+  //     role: "bot",
+  //     content: "Hello! How can I help you today?",
+  //     time: "10:00 AM",
+  //   },
+  //   {
+  //     id: 3,
+  //     role: "user",
+  //     content: "What’s the weather like today?",
+  //     time: "10:01 AM",
+  //   },
+  //   {
+  //     id: 4,
+  //     role: "bot",
+  //     content: "It's sunny and 28°C in your location.",
+  //     time: "10:01 AM",
+  //   },
+  //   {
+  //     id: 5,
+  //     role: "user",
+  //     content: "Nice. Can you set a reminder for 2 PM?",
+  //     time: "10:02 AM",
+  //   },
+  //   {
+  //     id: 6,
+  //     role: "bot",
+  //     content: "Sure! Reminder set for 2 PM.",
+  //     time: "10:02 AM",
+  //   },
+  //   {
+  //     id: 7,
+  //     role: "user",
+  //     content: "Thanks. What’s on my to-do list?",
+  //     time: "10:03 AM",
+  //   },
+  //   {
+  //     id: 8,
+  //     role: "bot",
+  //     content:
+  //       "You have 3 tasks: Finish report, Attend meeting at 1 PM, and Call mom.",
+  //     time: "10:03 AM",
+  //   },
+  //   {
+  //     id: 9,
+  //     role: "user",
+  //     content: "Can you mark 'Finish report' as done?",
+  //     time: "10:04 AM",
+  //   },
+  //   {
+  //     id: 10,
+  //     role: "bot",
+  //     content: "✅ 'Finish report' marked as completed.",
+  //     time: "10:04 AM",
+  //   },
+  //   {
+  //     id: 11,
+  //     role: "user",
+  //     content: "What’s the next task?",
+  //     time: "10:05 AM",
+  //   },
+  //   {
+  //     id: 12,
+  //     role: "bot",
+  //     content: "Next task: Attend meeting at 1 PM.",
+  //     time: "10:05 AM",
+  //   },
+  //   {
+  //     id: 13,
+  //     role: "user",
+  //     content: "Remind me 10 minutes before the meeting.",
+  //     time: "10:06 AM",
+  //   },
+  //   {
+  //     id: 14,
+  //     role: "bot",
+  //     content: "Got it. I’ll remind you at 12:50 PM.",
+  //     time: "10:06 AM",
+  //   },
+  //   {
+  //     id: 15,
+  //     role: "user",
+  //     content: "Awesome. You're the best!",
+  //     time: "10:07 AM",
+  //   },
+  // ];
+  const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     if (scrollRef.current) {

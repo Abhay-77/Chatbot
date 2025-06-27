@@ -3,11 +3,14 @@ import cors from "cors";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import { test, client } from "./mongodb";
+import { ChatHistoryItem, User } from "../../shared/types";
+import { Collection } from "mongodb";
+import { v4 as uuid } from "uuid";
 
 const app = express();
 
 const db = client.db("chatbot");
-const coll = db.collection("users");
+const coll: Collection<User> = db.collection("users");
 
 app.use(cors());
 app.use(express.json());
@@ -32,8 +35,56 @@ function requireLogin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-app.get("/", requireLogin, (req, res) => {
-  res.send("Home page " + req.session.user?.username);
+app.get("/", requireLogin, async (req, res) => {
+  try {
+    const data = await coll.findOne(
+      { username: req.session.user?.username },
+      { projection: { history: 1, _id: 0 } }
+    );
+    if (data?.history) {
+      res.json({ message: data.history });
+    } else {
+      res.json({ message: [] });
+    }
+  } catch (e) {
+    res.json({ message: ["Error loading messages"] });
+  }
+});
+
+app.post("/chat/add", async (req, res) => {
+  const { historyItemId, message } = req.body;
+  try {
+    const user = await coll.findOne(
+      { username: req.session.user?.username },
+      { projection: { password: 0, _id: 0 } }
+    );
+    const chatExists = user?.history?.some(
+      (item: ChatHistoryItem) => item.id == historyItemId
+    );
+    console.log(chatExists);
+    if (chatExists) {
+      await coll.updateOne(
+        { username: req.session.user?.username, "history.id": historyItemId },
+        { $push: { "history.$.chatMessages": message } }
+      );
+    } else {
+      await coll.updateOne(
+        { username: req.session.user?.username },
+        {
+          $push: {
+            history: {
+              chatMessages: [message],
+              title: "New chat",
+              id: uuid(),
+            },
+          },
+        }
+      );
+    }
+    res.status(200).json({ success: true });
+  } catch (e) {
+    res.send("Couldn't add chat item");
+  }
 });
 
 async function getUser(username: string, password: string) {
