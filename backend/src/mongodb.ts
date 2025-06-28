@@ -1,6 +1,9 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://Hawk:Hawk%40doccheck@cluster0.kc205jc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+import { MongoClient, ServerApiVersion } from 'mongodb'
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const uri = process.env.MONGODB_URI!;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
