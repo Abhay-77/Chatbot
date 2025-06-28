@@ -118,6 +118,22 @@ const App = () => {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
+  React.useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/chat/history");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = response.json;
+        console.log(data);
+        // setChatMessages(data.message);
+      } catch (e) {
+        console.log("Error loading history", e);
+      }
+    };
+    fetchHistory();
+  }, []);
   const handleSubmit = () => {
     setChatMessages([
       ...chatMessages,

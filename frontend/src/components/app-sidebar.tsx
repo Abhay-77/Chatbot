@@ -12,6 +12,12 @@ import {
 } from "./ui/sidebar";
 import { CiSearch } from "react-icons/ci";
 import { MdAccountCircle } from "react-icons/md";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "./ui/button";
 
 export default function AppSidebar() {
   const menuItems = [
@@ -75,10 +81,22 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-neutral-300">
         <SidebarMenu>
-          <div className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200">
-            <MdAccountCircle size={20} />
-            <h2 className="">Account</h2>
-          </div>
+          <Popover>
+            <PopoverTrigger>
+              <div className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200">
+                <MdAccountCircle size={20} />
+                <h2 className="">Account</h2>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="p-1 text-lg">Name</div>
+              <form action="http://localhost:3000/logout" method="post">
+                <Button type="submit" className="bg-neutral-700">
+                  Logout
+                </Button>
+              </form>
+            </PopoverContent>
+          </Popover>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarFooter />
