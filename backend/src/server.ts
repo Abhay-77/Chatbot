@@ -3,10 +3,11 @@ import cors from "cors";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import { test, client } from "./mongodb";
-import { ChatHistoryItem, User } from "../../shared/types";
+import { ChatHistoryItem, ChatMessageType, User } from "../../shared/types";
 import { Collection } from "mongodb";
 import { v4 as uuid } from "uuid";
 import dotenv from "dotenv";
+import path from "path";
 
 const app = express();
 dotenv.config();
@@ -14,7 +15,8 @@ dotenv.config();
 const db = client.db("chatbot");
 const coll: Collection<User> = db.collection("users");
 
-app.use(cors());
+// app.use(cors());
+app.use(express.static(path.resolve(__dirname, "../../frontend/dist")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -38,7 +40,7 @@ function requireLogin(req: Request, res: Response, next: NextFunction) {
     next();
   } else {
     console.log("Not logged in");
-    res.redirect("/login");
+    res.status(401).json({ message: "Unauthorized" });
   }
 }
 
@@ -74,7 +76,10 @@ app.post("/chat/history/delete", requireLogin, async (req, res) => {
 });
 
 app.post("/chat/add", requireLogin, async (req, res) => {
-  const { historyItemId, message } = req.body;
+  const {
+    historyItemId,
+    message,
+  }: { historyItemId: string; message: ChatMessageType } = req.body;
   try {
     const user = await coll.findOne(
       { username: req.session.user?.username },
@@ -89,7 +94,7 @@ app.post("/chat/add", requireLogin, async (req, res) => {
         { $push: { "history.$.chatMessages": message } }
       );
     } else {
-      const title: string = await generateTitle(message);
+      const title: string = await generateTitle(message.content);
       await coll.updateOne(
         { username: req.session.user?.username },
         {
@@ -98,6 +103,7 @@ app.post("/chat/add", requireLogin, async (req, res) => {
               chatMessages: [message],
               title: title,
               id: historyItemId ? historyItemId : uuid(),
+              date:new Date()
             },
           },
         }
@@ -116,18 +122,21 @@ async function generateTitle(message: string): Promise<string> {
 
 async function getUser(username: string, password: string) {
   try {
-    const user = await coll.findOne({ username: username });
+    const user = await coll.findOne(
+      { username: username },
+      { projection: { username: 1, password: 1 } }
+    );
     if (!user) {
       return null;
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    return isMatch ? user : null;
+    return isMatch ? { username: user.username } : null;
   } catch (e) {
     console.log("Not able to fetch user", e);
   }
 }
 
-app.get("/api/me", (req, res) => {
+app.get("/api/me", requireLogin, (req, res) => {
   if (req.session.user) {
     res.send({ user: req.session.user });
   } else {
@@ -142,9 +151,10 @@ app.post("/login", async (req, res) => {
   if (user) {
     req.session.user = { username };
     console.log("Logged in");
-    res.send("Logged in");
+    res.redirect("/");
   } else {
-    res.send("Invalid credentials");
+    console.log("Invalid credentials");
+    res.status(401).json({ message: "Invalid credentials" });
   }
 });
 
@@ -161,11 +171,11 @@ app.post("/signup", async (req, res) => {
         username: username,
         password: await bcrypt.hash(password, 10),
       });
-      res.send("Signed up");
+      res.redirect("/login");
     }
   } catch (e) {
     console.log("Error adding user", e);
-    res.send("Error signing up");
+    res.status(500).send("Error signing up");
   }
 });
 
@@ -176,12 +186,12 @@ app.post("/logout", (req, res) => {
       return res.status(500).send("Logout failed");
     }
     res.clearCookie("connect.sid");
-    res.send("Logged out");
+    res.redirect("/login");
   });
 });
 
-app.get("/login", (req, res) => {
-  res.send("Please login");
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../../frontend/dist/index.html"));
 });
 
 async function start() {

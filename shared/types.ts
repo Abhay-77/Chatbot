@@ -1,5 +1,5 @@
 export type ChatMessageType = {
-  content: string | null;
+  content: string;
   role: "user" | "bot";
   id: string;
   time: string;
@@ -9,6 +9,7 @@ export type ChatHistoryItem = {
   id: string;
   title: string;
   chatMessages: ChatMessageType[];
+  date:Date
 };
 
 export type ChatHistory = ChatHistoryItem[];

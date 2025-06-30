@@ -11,31 +11,78 @@ import {
   SidebarTrigger,
 } from "./ui/sidebar";
 import { CiSearch } from "react-icons/ci";
-import { MdAccountCircle } from "react-icons/md";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "./ui/button";
+import { AccountDetails } from "./Account";
+import type { ChatHistory } from "../../../shared/types";
+import HistoryItemUI from "./HistoryItemUI";
 
-export default function AppSidebar() {
+export default function AppSidebar({ history }: { history?: ChatHistory }) {
   const menuItems = [
     { name: "New chat", icon: HiPencil },
     { name: "Search", icon: CiSearch },
   ];
-  const historyData = [
-    { id: 1, name: "Login", time: "2025-06-25 10:23 AM" },
-    { id: 2, name: "Viewed Dashboard", time: "2025-06-25 10:25 AM" },
-    { id: 3, name: "Edited Profile", time: "2025-06-25 10:30 AM" },
-    { id: 4, name: "Logged Out", time: "2025-06-25 10:45 AM" },
-    { id: 5, name: "Login", time: "2025-06-26 09:05 AM" },
-    { id: 6, name: "Viewed Settings", time: "2025-06-26 09:10 AM" },
-    { id: 7, name: "Updated Password", time: "2025-06-26 09:15 AM" },
-    { id: 8, name: "Logged Out", time: "2025-06-26 09:20 AM" },
-    { id: 9, name: "Login", time: "2025-06-26 10:00 AM" },
-    { id: 10, name: "Viewed Reports", time: "2025-06-26 10:10 AM" },
-  ];
+  // const historyData = [
+  //   {
+  //     id: "1",
+  //     title: "Loginaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  //     date: new Date("2025-06-25T10:23:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "2",
+  //     title:
+  //       "Viewed Dashboard aaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaa",
+  //     date: new Date("2025-06-25T10:25:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "Edited Profileaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  //     date: new Date("2025-06-25T10:30:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "4",
+  //     title: "Logged Out",
+  //     date: new Date("2025-06-25T10:45:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "5",
+  //     title: "Login",
+  //     date: new Date("2025-06-26T09:05:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "6",
+  //     title: "Viewed Settings",
+  //     date: new Date("2025-06-26T09:10:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "7",
+  //     title: "Updated Password",
+  //     date: new Date("2025-06-26T09:15:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "8",
+  //     title: "Logged Out",
+  //     date: new Date("2025-06-26T09:20:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "9",
+  //     title: "Login",
+  //     date: new Date("2025-06-26T10:00:00"),
+  //     chatMessages: [],
+  //   },
+  //   {
+  //     id: "10",
+  //     title: "Viewed Reports",
+  //     date: new Date("2025-06-26T10:10:00"),
+  //     chatMessages: [],
+  //   },
+  // ];
 
   return (
     <Sidebar>
@@ -66,37 +113,21 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {historyData.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200"
-                >
-                  <h2 className="">{item.name}</h2>
-                </div>
-              ))}
+            <SidebarMenu className="gap-2">
+              {history ? (
+                history.map((item) => <HistoryItemUI item={item} />)
+              ) : (
+                <h2 className="text-lg p-2 w-full text-medium text-neutral-700">
+                  No history
+                </h2>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-neutral-300">
         <SidebarMenu>
-          <Popover>
-            <PopoverTrigger>
-              <div className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200">
-                <MdAccountCircle size={20} />
-                <h2 className="">Account</h2>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent>
-              <div className="p-1 text-lg">Name</div>
-              <form action="http://localhost:3000/logout" method="post">
-                <Button type="submit" className="bg-neutral-700">
-                  Logout
-                </Button>
-              </form>
-            </PopoverContent>
-          </Popover>
+          <AccountDetails />
         </SidebarMenu>
       </SidebarFooter>
       <SidebarFooter />

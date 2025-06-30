@@ -10,7 +10,7 @@ import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { FaArrowUp } from "react-icons/fa";
 import React, { useState } from "react";
-import type { ChatMessageType } from "../../shared/types";
+import type { ChatHistory, ChatMessageType } from "../../shared/types";
 import { v4 as uuid } from "uuid";
 
 const ConditionalTrigger = React.memo(() => {
@@ -112,6 +112,7 @@ const App = () => {
   //   },
   // ];
   const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
+  const [history, setHistory] = useState<ChatHistory>();
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     if (scrollRef.current) {
@@ -122,12 +123,17 @@ const App = () => {
     const fetchHistory = async () => {
       try {
         const response = await fetch("http://localhost:3000/chat/history");
+        if (response.status == 401) {
+          console.log("Please login");
+          window.location.href = "/login";
+        }
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = response.json;
+        const data = await response.json();
         console.log(data);
-        // setChatMessages(data.message);
+        const history: ChatHistory = data.message;
+        setHistory(history);
       } catch (e) {
         console.log("Error loading history", e);
       }
@@ -147,26 +153,33 @@ const App = () => {
         }),
       },
     ]);
+    setMessage("");
   };
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar history={history} />
       <main className="text-neutral-800 z-50 bg-white h-screen w-screen">
         <ConditionalTrigger />
         <section className="bg-neutral-100 py-6 px-4 h-full flex flex-col justify-end">
           <ScrollArea className="max-h-[90%] p-2">
-            {chatMessages.map((mess) => (
-              <p
-                key={mess.id}
-                className={clsx(
-                  `bg-neutral-300 hover:bg-neutral-200 rounded-lg min-h-12 py-1 px-3
+            {chatMessages && chatMessages.length > 0 ? (
+              chatMessages.map((mess) => (
+                <p
+                  key={mess.id}
+                  className={clsx(
+                    `bg-neutral-300 hover:bg-neutral-200 rounded-lg min-h-12 py-1 px-3
                 max-w-[40vw] text-wrap m-2 flex items-center w-fit`,
-                  { "justify-self-end": mess.role == "user" }
-                )}
-              >
-                {mess.content}
-              </p>
-            ))}
+                    { "justify-self-end": mess.role == "user" }
+                  )}
+                >
+                  {mess.content}
+                </p>
+              ))
+            ) : (
+              <h1 className="text-3xl font-semibold text-center w-full">
+                Ask anything
+              </h1>
+            )}
             <div ref={scrollRef} />
           </ScrollArea>
           <form
@@ -187,7 +200,7 @@ const App = () => {
               size="icon"
               type="submit"
               className="size-8 absolute bottom-2 right-2 bg-neutral-400"
-              // onClick={handleSubmit}
+              disabled={!!message}
             >
               <FaArrowUp />
             </Button>
