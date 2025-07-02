@@ -1,5 +1,5 @@
 import { MdOutlineDelete } from "react-icons/md";
-import type { ChatHistoryItem } from "../../../shared/types";
+import type { ChatHistoryItem } from "../../../backend/src/shared/types";
 
 const HistoryItemUI = ({ item }: { item: ChatHistoryItem }) => {
   return (

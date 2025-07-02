@@ -10,7 +10,10 @@ import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { FaArrowUp } from "react-icons/fa";
 import React, { useState } from "react";
-import type { ChatHistory, ChatMessageType } from "../../shared/types";
+import type {
+  ChatHistory,
+  ChatMessageType,
+} from "../../backend/src/shared/types";
 import { v4 as uuid } from "uuid";
 
 const ConditionalTrigger = React.memo(() => {

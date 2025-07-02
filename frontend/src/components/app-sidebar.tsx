@@ -12,7 +12,7 @@ import {
 } from "./ui/sidebar";
 import { CiSearch } from "react-icons/ci";
 import { AccountDetails } from "./Account";
-import type { ChatHistory } from "../../../shared/types";
+import type { ChatHistory } from "../../../backend/src/shared/types";
 import HistoryItemUI from "./HistoryItemUI";
 
 export default function AppSidebar({ history }: { history?: ChatHistory }) {

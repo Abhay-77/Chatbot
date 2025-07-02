@@ -3,7 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import { test, client } from "./mongodb";
-import { ChatHistoryItem, ChatMessageType, User } from "../../shared/types";
+import { ChatHistoryItem, ChatMessageType, User } from "./shared/types";
 import { Collection } from "mongodb";
 import { v4 as uuid } from "uuid";
 import dotenv from "dotenv";
