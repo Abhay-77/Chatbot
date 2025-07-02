@@ -16,7 +16,7 @@ import { v4 as uuid } from "uuid";
 const ConditionalTrigger = React.memo(() => {
   const { state } = useSidebar();
   if (state == "collapsed" || window.innerWidth < 768) {
-    return <SidebarTrigger className="absolute" />;
+    return <SidebarTrigger className="absolute hover:bg-neutral-200 m-1" />;
   }
   return null;
 });
@@ -114,6 +114,7 @@ const App = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
   const [history, setHistory] = useState<ChatHistory>();
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -122,29 +123,29 @@ const App = () => {
   React.useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch("http://localhost:3000/chat/history");
+        const response = await fetch("/api/chat/history");
         if (response.status == 401) {
-          console.log("Please login");
           window.location.href = "/login";
         }
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
         const history: ChatHistory = data.message;
         setHistory(history);
       } catch (e) {
-        console.log("Error loading history", e);
+        console.error("Error loading history", e);
       }
     };
     fetchHistory();
   }, []);
-  const handleSubmit = () => {
-    setChatMessages([
-      ...chatMessages,
+  const handleSubmit = async () => {
+    const mess = message;
+    setMessage("");
+    setChatMessages((prev) => [
+      ...prev,
       {
-        content: message,
+        content: mess,
         role: "user",
         id: uuid(),
         time: new Date().toLocaleTimeString([], {
@@ -153,7 +154,27 @@ const App = () => {
         }),
       },
     ]);
-    setMessage("");
+    setLoading(true);
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ prompt: mess }),
+    });
+    const text = await response.json();
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        content: text.message,
+        role: "bot",
+        id: uuid(),
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+    setLoading(false);
   };
   return (
     <SidebarProvider>
@@ -164,19 +185,18 @@ const App = () => {
           <ScrollArea className="max-h-[90%] p-2">
             {chatMessages && chatMessages.length > 0 ? (
               chatMessages.map((mess) => (
-                <p
+                <div
                   key={mess.id}
                   className={clsx(
                     `bg-neutral-300 hover:bg-neutral-200 rounded-lg min-h-12 py-1 px-3
-                max-w-[40vw] text-wrap m-2 flex items-center w-fit`,
+                max-w-[40vw] text-wrap m-2 flex flex-col justify-center w-fit`,
                     { "justify-self-end": mess.role == "user" }
                   )}
-                >
-                  {mess.content}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: mess.content }}
+                />
               ))
             ) : (
-              <h1 className="text-3xl font-semibold text-center w-full">
+              <h1 className="text-3xl font-semibold text-center w-full cursor-default">
                 Ask anything
               </h1>
             )}
@@ -200,7 +220,7 @@ const App = () => {
               size="icon"
               type="submit"
               className="size-8 absolute bottom-2 right-2 bg-neutral-400"
-              disabled={!!message}
+              disabled={!message || loading}
             >
               <FaArrowUp />
             </Button>

@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import { MongoClient, ServerApiVersion } from "mongodb";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -16,11 +16,11 @@ async function test() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Connected to database");
+    }
   } catch (e) {
-    console.log("Not able to estabilish connection",e);
+    console.error("Not able to estabilish connection", e);
   }
 }
 

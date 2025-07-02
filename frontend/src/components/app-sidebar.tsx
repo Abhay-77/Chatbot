@@ -89,9 +89,9 @@ export default function AppSidebar({ history }: { history?: ChatHistory }) {
       <SidebarHeader className="flex flex-row justify-between px-4">
         <div className="flex gap-2 items-center">
           <img src="/logo.png" alt="logo" className="size-8 rounded-full" />
-          <h1 className="text-xl font-medium">Chatbot</h1>
+          <h1 className="text-xl font-medium cursor-default">Chatbot</h1>
         </div>
-        <SidebarTrigger />
+        <SidebarTrigger className="hover:bg-neutral-200" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -101,7 +101,7 @@ export default function AppSidebar({ history }: { history?: ChatHistory }) {
               {menuItems.map((item) => (
                 <div
                   key={item.name}
-                  className="flex gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200"
+                  className="flex cursor-default gap-2 items-center w-full rounded-md p-2 hover:bg-neutral-200"
                 >
                   <item.icon size={20} />
                   <h2 className="">{item.name}</h2>
@@ -113,9 +113,11 @@ export default function AppSidebar({ history }: { history?: ChatHistory }) {
         <SidebarGroup>
           <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-2">
+            <SidebarMenu>
               {history ? (
-                history.map((item) => <HistoryItemUI item={item} />)
+                history.map((item) => (
+                  <HistoryItemUI key={item.id} item={item} />
+                ))
               ) : (
                 <h2 className="text-lg p-2 w-full text-medium text-neutral-700">
                   No history

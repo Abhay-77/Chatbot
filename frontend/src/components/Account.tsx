@@ -32,10 +32,10 @@ export const AccountDetails = () => {
           <h2 className="">{username}</h2>
         </div>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className="cursor-default">
         <div className="p-1 text-lg">{username}</div>
-        <form action="http://localhost:3000/logout" method="post">
-          <Button type="submit" className="bg-neutral-700">
+        <form action="/api/logout" method="post">
+          <Button type="submit" className="bg-neutral-700 cursor-pointer">
             Logout
           </Button>
         </form>

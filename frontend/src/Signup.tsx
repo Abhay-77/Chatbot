@@ -6,7 +6,7 @@ const Signup = () => {
   return (
     <main className="h-screen w-screen flex items-center justify-center bg-neutral-200">
       <form
-        action="http://localhost:3000/signup"
+        action="/api/signup"
         method="post"
         className="bg-white p-6 rounded-lg sm:w-[90%] md:w-[40%] lg:w-[35%] xl:w-[30%] border border-gray-300 flex flex-col gap-4"
       >
@@ -36,7 +36,7 @@ const Signup = () => {
         <h3 className="">
           Already have an account?{" "}
           <Link to={"/login"} className="text-blue-500 underline">
-            Login
+            Sign up
           </Link>
         </h3>
       </form>
